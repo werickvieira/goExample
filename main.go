@@ -3,7 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
+	"io/ioutil"
 	"encoding/json"
+	"fmt"
 )
 
 // Message Model
@@ -21,6 +23,12 @@ func setHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 }
 
+func getHTMLCode(response *http.Response) (string) {
+	defer response.Body.Close()
+	body, _ := ioutil.ReadAll(response.Body)
+	return string(body)
+}
+
 func errorHandler(w http.ResponseWriter, status int) {
 	w.WriteHeader(status)
 	response := ErrorMessage{"Dominio nao encontrado", status}
@@ -34,6 +42,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		errorHandler(w, http.StatusNotFound)
 		return
 	}
+	stringHTML := getHTMLCode(response)
+	fmt.Fprint(w, stringHTML)
 }
 
 func main() {
