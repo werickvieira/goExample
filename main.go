@@ -5,7 +5,12 @@ import (
 	"net/http"
 )
 
+func setHeaders(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	setHeaders(w)
 }
 
 func main() {
