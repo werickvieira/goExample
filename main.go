@@ -3,47 +3,22 @@ package main
 import (
 	"log"
 	"net/http"
-	"io/ioutil"
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"strings"
 	"regexp"
-	"unicode"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
+	"github.com/werickvieira/goExample/util"
 )
 
 // Message Model
 type Message struct {
-	Total int64
+	Total int
 }
 
 // ErrorMessage Model
 type ErrorMessage struct {
 	Message string
 	CodeError int
-}
-
-func setHeaders(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
-}
-
-func getHTMLCode(response *http.Response) (string) {
-	defer response.Body.Close()
-	body, _ := ioutil.ReadAll(response.Body)
-	return string(body)
-}
-
-func getWordsFrom(text string) []string {
-	words := regexp.MustCompile(`[\p{L}\d_]+`)
-	return words.FindAllString(text, -1)
-}
-
-func removeAccent(word string) string {
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	s, _, _ := transform.String(t, word)
-	return s;
 }
 
 func errorHandler(w http.ResponseWriter, status int) {
@@ -53,32 +28,27 @@ func errorHandler(w http.ResponseWriter, status int) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	setHeaders(w)
+	util.SetHeaders(w)
 	param := r.URL.Query().Get("q")
-	response, err := http.Get("https://www.zoom.com.br") // https://www.americanas.com.br/
+	response, err := http.Get("https://www.americanas.com.br/")
 	if err != nil {
 		errorHandler(w, http.StatusNotFound)
 		return
 	}
 
-
-	fmt.Fprintln(w, "Status resposta: ", response.StatusCode)
 	if response.StatusCode == http.StatusOK {
-		stringHTML := getHTMLCode(response)
-		arrWords := getWordsFrom(stringHTML)
+		stringHTML := util.GetHTMLCode(response)
+		arrWords := util.GetWordsFrom(stringHTML)
 		arrElements := make([]string, 0)
-		valid := regexp.MustCompile(`^`+param+``)
+		valid := regexp.MustCompile(``+param+``)
 		for _ , element := range arrWords {
-			// fmt.Fprintln(w, "@@@ index", index)
-			// fmt.Fprintln(w, "@@@ element",´ element)
 			a:= strings.ToLower(param)
-			b:= strings.ToLower(removeAccent(element))
+			b:= strings.ToLower(util.RemoveAccent(element))
 			if valid.MatchString(a) && valid.MatchString(b) {
 				arrElements = append(arrElements, element)
 			}
 		}
-		// fmt.Fprintln(w, "$$$$$$", s)
-		fmt.Fprintln(w, "$$$$$$", len(arrElements))
+		json.NewEncoder(w).Encode(Message{len(arrElements)})
 	}
 }
 
