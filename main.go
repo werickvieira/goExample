@@ -66,7 +66,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if response.StatusCode == http.StatusOK {
 		stringHTML := getHTMLCode(response)
 		arrWords := getWordsFrom(stringHTML)
-		// convertString := strings.Join(arrWords, " ")
 		arrElements := make([]string, 0)
 		valid := regexp.MustCompile(`^`+param+``)
 		for _ , element := range arrWords {
@@ -74,25 +73,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			// fmt.Fprintln(w, "@@@ element",´ element)
 			a:= strings.ToLower(param)
 			b:= strings.ToLower(removeAccent(element))
-			// fmt.Fprintln(w, "##len", len(element))
-			// fmt.Fprintln(w, "##SPLIT", strings.Split(element, ""))
-			// fmt.Fprintln(w, "##REMOVED", removeAccent(element))
-			// if strings.EqualFold(a, b) {
-			// 	// fmt.Fprintln(w, "")
-			// 	// fmt.Fprintln(w, "@@@ CAIU @@@@")
-			// 	// fmt.Fprintln(w, "")
-			// 	s = append(s, element)
-			// }
 			if valid.MatchString(a) && valid.MatchString(b) {
 				arrElements = append(arrElements, element)
 			}
 		}
 		// fmt.Fprintln(w, "$$$$$$", s)
 		fmt.Fprintln(w, "$$$$$$", len(arrElements))
-		// fmt.Fprintln(w, strings.Count(convertString, "Notebook"))
-		// fmt.Fprintln(w, strings.Count(convertString, "notebook"))
-		fmt.Fprintln(w, param)
-		// fmt.Fprint(w, stringHTML)
 	}
 }
 
